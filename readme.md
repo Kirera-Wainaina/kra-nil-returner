@@ -24,6 +24,7 @@ I'll wire it up to send me an email if the process is a success or a failure. Ei
 ## Things to bear in mind
 1. A notification should anything on the website change.
 2. A notification in case of failure
+3. Keep retrying if there is no WIFI where I am located
 
 >[!Note]
 > Still in beta version and details might change
