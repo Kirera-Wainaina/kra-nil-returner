@@ -1,0 +1,9 @@
+{
+  "name": "kra-nil-returner",
+  "version": "0.0.1",
+  "description": "Automatically file nil returns for specified accounts and users on the KRA Itax portal",
+  "main": "index.js",
+  "repository": "https://github.com/Kirera-Wainaina/kra-nil-returner.git",
+  "author": "Kirera Wainaina <richardwainainak@gmail.com>",
+  "license": "MIT"
+}
