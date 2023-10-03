@@ -1,0 +1,4 @@
+node_modules/
+
+# holds the browser and other puppeteer files
+.cache/
