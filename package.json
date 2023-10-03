@@ -5,5 +5,8 @@
   "main": "index.js",
   "repository": "https://github.com/Kirera-Wainaina/kra-nil-returner.git",
   "author": "Kirera Wainaina <richardwainainak@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^21.3.6"
+  }
 }
