@@ -40,10 +40,11 @@ const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 function fileReturn() {
     return __awaiter(this, void 0, void 0, function* () {
-        const browser = yield puppeteer_1.default.launch();
+        const browser = yield puppeteer_1.default.launch({ headless: 'new' });
         const loginPage = yield getLoginPage(browser);
         yield enterKRAPIN(loginPage);
-        // await enterPassword(loginPage)
+        yield enterPassword(loginPage);
+        // console.log(await loginPage.content())
     });
 }
 function getLoginPage(browser) {
@@ -61,6 +62,12 @@ function enterKRAPIN(loginPage) {
         yield loginPage.locator("a.btn")
             .filter(button => button.text == 'Continue')
             .click();
+    });
+}
+function enterPassword(loginPage) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield loginPage.locator('#xxZTT9p2wQ[type="password"]')
+            .fill(process.env.COMPANY_PASSWORD);
     });
 }
 fileReturn();
