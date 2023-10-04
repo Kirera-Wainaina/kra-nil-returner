@@ -45,10 +45,9 @@ function fileReturn() {
         const loginPage = yield getLoginPage(browser);
         yield enterKRAPIN(loginPage);
         yield enterPassword(loginPage);
-        const captchaLink = yield getCaptchaLink(loginPage);
-        const client = new vision.ImageAnnotatorClient();
-        const [result] = yield client.textDetection(captchaLink);
-        console.log(result);
+        const captchaText = yield getCaptureText(loginPage);
+        // doTheMath(captchaText)
+        console.log(captchaText);
     });
 }
 function getLoginPage(browser) {
@@ -80,6 +79,14 @@ function getCaptchaLink(loginPage) {
             const captcha = document.getElementById('captcha_img');
             return captcha.src;
         });
+    });
+}
+function getCaptureText(loginPage) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const captchaLink = yield getCaptchaLink(loginPage);
+        const client = new vision.ImageAnnotatorClient();
+        const [result] = yield client.textDetection(captchaLink);
+        return result.fullTextAnnotation.text;
     });
 }
 fileReturn();

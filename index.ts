@@ -9,11 +9,10 @@ async function fileReturn() {
   const loginPage = await getLoginPage(browser)
   await enterKRAPIN(loginPage)
   await enterPassword(loginPage)
+  const captchaText = await getCaptureText(loginPage)
+  // doTheMath(captchaText)
   
-  const captchaLink = await getCaptchaLink(loginPage);
-  const client = new vision.ImageAnnotatorClient();
-  const [ result ] = await client.textDetection(captchaLink)
-  console.log(result)
+  console.log(captchaText)
 }
 async function getLoginPage(browser: Browser): Promise<Page> {
   const page = await browser.newPage();
@@ -41,5 +40,12 @@ async function getCaptchaLink(loginPage:Page) {
       const captcha = document.getElementById('captcha_img') as HTMLImageElement;
       return captcha.src
     })
+}
+
+async function getCaptureText(loginPage:Page) {
+  const captchaLink = await getCaptchaLink(loginPage);
+  const client = new vision.ImageAnnotatorClient();
+  const [ result ] = await client.textDetection(captchaLink)
+  return result.fullTextAnnotation.text
 }
 fileReturn()
