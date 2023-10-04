@@ -37,6 +37,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const dotenv = __importStar(require("dotenv"));
+const promises_1 = require("fs/promises");
+const path = __importStar(require("path"));
+const MIMETypes_1 = require("./MIMETypes");
 dotenv.config();
 function fileReturn() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -44,7 +47,7 @@ function fileReturn() {
         const loginPage = yield getLoginPage(browser);
         yield enterKRAPIN(loginPage);
         yield enterPassword(loginPage);
-        // console.log(await loginPage.content())
+        yield downloadCaptchaImage(browser, loginPage);
     });
 }
 function getLoginPage(browser) {
@@ -68,6 +71,25 @@ function enterPassword(loginPage) {
     return __awaiter(this, void 0, void 0, function* () {
         yield loginPage.locator('#xxZTT9p2wQ[type="password"]')
             .fill(process.env.COMPANY_PASSWORD);
+    });
+}
+function downloadCaptchaImage(browser, loginPage) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const captchaLink = yield loginPage.evaluate(() => {
+            const captcha = document.getElementById('captcha_img');
+            return captcha.src;
+        });
+        const newPage = yield browser.newPage();
+        newPage.on('response', (response) => __awaiter(this, void 0, void 0, function* () {
+            if (response.request().resourceType() === "image" ||
+                response.request().resourceType() === "document") {
+                const buffer = yield response.buffer();
+                const extension = (0, MIMETypes_1.findExtensionFromMIMEType)(response.headers()['content-type']);
+                yield (0, promises_1.writeFile)(path.join(__dirname, `captcha${extension}`), buffer);
+                console.log('captcha saved');
+            }
+        }));
+        yield newPage.goto(captchaLink);
     });
 }
 fileReturn();
