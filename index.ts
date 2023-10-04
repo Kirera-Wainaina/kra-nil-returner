@@ -1,8 +1,6 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import * as dotenv from "dotenv";
-import { writeFile } from "fs/promises"
-import * as path from "path";
-import { findExtensionFromMIMEType } from "./MIMETypes"
+import * as vision from "@google-cloud/vision"
 
 dotenv.config()
 
@@ -11,7 +9,11 @@ async function fileReturn() {
   const loginPage = await getLoginPage(browser)
   await enterKRAPIN(loginPage)
   await enterPassword(loginPage)
-  await downloadCaptchaImage(browser, loginPage)
+  
+  const captchaLink = await getCaptchaLink(loginPage);
+  const client = new vision.ImageAnnotatorClient();
+  const [ result ] = await client.textDetection(captchaLink)
+  console.log(result)
 }
 async function getLoginPage(browser: Browser): Promise<Page> {
   const page = await browser.newPage();
@@ -34,22 +36,10 @@ async function enterPassword(loginPage:Page) {
     .fill(process.env.COMPANY_PASSWORD)
 }
 
-async function downloadCaptchaImage(browser:Browser, loginPage:Page) {
-  const captchaLink = await loginPage.evaluate(() => {
-    const captcha = document.getElementById('captcha_img') as HTMLImageElement;
-    return captcha.src
-  })
-  const newPage = await browser.newPage()
-
-  newPage.on('response', async response => {
-    if (response.request().resourceType() === "image" ||
-      response.request().resourceType() === "document") {
-      const buffer = await response.buffer();
-      const extension = findExtensionFromMIMEType(response.headers()['content-type'])
-      await writeFile(path.join(__dirname, `captcha${extension}`), buffer)
-      console.log('captcha saved')
-    }
-  })
-  await newPage.goto(captchaLink)
+async function getCaptchaLink(loginPage:Page) {
+  return loginPage.evaluate(() => {
+      const captcha = document.getElementById('captcha_img') as HTMLImageElement;
+      return captcha.src
+    })
 }
 fileReturn()
